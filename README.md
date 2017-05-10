@@ -1,2 +1,2 @@
-# CAN-Network
-Implementation of CAN Network on E2LP platform
+# I2C_on_E2LP
+Implementation of I2C communication beetwen two E2LPs with test game.
