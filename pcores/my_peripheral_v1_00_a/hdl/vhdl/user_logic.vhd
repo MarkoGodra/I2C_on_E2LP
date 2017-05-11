@@ -133,6 +133,7 @@ end entity user_logic;
 architecture IMP of user_logic is
 
   --USER signal declarations added here, as needed for user logic
+  
 
   ------------------------------------------
   -- Signals for user logic slave model s/w accessible register example
@@ -194,7 +195,7 @@ begin
   end process SLAVE_REG_WRITE_PROC;
 
   -- implement slave model software accessible register(s) read mux
-  SLAVE_REG_READ_PROC : process( slv_reg_read_sel, slv_reg0 ) is
+  SLAVE_REG_READ_PROC : process( slv_reg_read_sel, slv_reg0, interrupt_reg ) is
   begin
 
     case slv_reg_read_sel is
