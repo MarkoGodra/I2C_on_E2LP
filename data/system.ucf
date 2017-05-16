@@ -82,7 +82,3 @@ NET vga_periph_0_blue_o_pin(4)         LOC = C18  | IOSTANDARD = LVTTL;
 NET vga_periph_0_blue_o_pin(5)         LOC = K18  | IOSTANDARD = LVTTL;
 NET vga_periph_0_blue_o_pin(6)         LOC = C19  | IOSTANDARD = LVTTL;
 NET vga_periph_0_blue_o_pin(7)         LOC = C20  | IOSTANDARD = LVTTL;
-
-
-NET axi_iic_0_Scl_pin   	  LOC = "C6"  |  IOSTANDARD = "LVCMOS33"; # segm_g, SNAPW_1
-NET axi_iic_0_Sda_pin       LOC = "C5"  |  IOSTANDARD = "LVCMOS33"; # segm_p, SNAPW_0
