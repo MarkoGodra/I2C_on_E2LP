@@ -17,23 +17,24 @@ NET CLK_P LOC = "AD14"  |  IOSTANDARD = "LVDS_33";
 NET axi_iic_0_Scl_pin LOC = "C5"  	|  IOSTANDARD = "LVCMOS33"; 	#SCL
 NET axi_iic_0_Sda_pin LOC = "C6" 	| 	IOSTANDARD = "LVCMOS33";   #SDA
 
-NET my_peripheral_0_DIP_Data_pin[0] LOC = "W19"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_DIP_Data_pin[1] LOC = "Y24"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_DIP_Data_pin[2] LOC = "W24"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_DIP_Data_pin[3] LOC = "V24"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_DIP_Data_pin[4] LOC = "U20"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_DIP_Data_pin[5] LOC = "U23"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_DIP_Data_pin[6] LOC = "U24"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_DIP_Data_pin[7] LOC = "U19"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_DIP_Data_pin[0] LOC = "W19"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_DIP_Data_pin[1] LOC = "Y24"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_DIP_Data_pin[2] LOC = "W24"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_DIP_Data_pin[3] LOC = "V24"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_DIP_Data_pin[4] LOC = "U20"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_DIP_Data_pin[5] LOC = "U23"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_DIP_Data_pin[6] LOC = "U24"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_DIP_Data_pin[7] LOC = "U19"  |  IOSTANDARD = "LVCMOS33";
+#
+#NET my_peripheral_0_LED_Data_pin[0] LOC = "N24"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_LED_Data_pin[1] LOC = "N23"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_LED_Data_pin[2] LOC = "M24"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_LED_Data_pin[3] LOC = "L24"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_LED_Data_pin[4] LOC = "L23"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_LED_Data_pin[5] LOC = "K24"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_LED_Data_pin[6] LOC = "H24"  |  IOSTANDARD = "LVCMOS33";
+#NET my_peripheral_0_LED_Data_pin[7] LOC = "D24"  |  IOSTANDARD = "LVCMOS33";
 
-NET my_peripheral_0_LED_Data_pin[0] LOC = "N24"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_LED_Data_pin[1] LOC = "N23"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_LED_Data_pin[2] LOC = "M24"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_LED_Data_pin[3] LOC = "L24"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_LED_Data_pin[4] LOC = "L23"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_LED_Data_pin[5] LOC = "K24"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_LED_Data_pin[6] LOC = "H24"  |  IOSTANDARD = "LVCMOS33";
-NET my_peripheral_0_LED_Data_pin[7] LOC = "D24"  |  IOSTANDARD = "LVCMOS33";
 
 NET RS232_Uart_1_sin LOC = "A21"  |  IOSTANDARD = "LVCMOS33";
 NET RS232_Uart_1_sout LOC = "A20"  |  IOSTANDARD = "LVCMOS33";
@@ -81,3 +82,7 @@ NET vga_periph_0_blue_o_pin(4)         LOC = C18  | IOSTANDARD = LVTTL;
 NET vga_periph_0_blue_o_pin(5)         LOC = K18  | IOSTANDARD = LVTTL;
 NET vga_periph_0_blue_o_pin(6)         LOC = C19  | IOSTANDARD = LVTTL;
 NET vga_periph_0_blue_o_pin(7)         LOC = C20  | IOSTANDARD = LVTTL;
+
+
+NET axi_iic_0_Scl_pin   	  LOC = "C6"  |  IOSTANDARD = "LVCMOS33"; # segm_g, SNAPW_1
+NET axi_iic_0_Sda_pin       LOC = "C5"  |  IOSTANDARD = "LVCMOS33"; # segm_p, SNAPW_0
