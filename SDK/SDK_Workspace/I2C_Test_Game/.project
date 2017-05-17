@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>I2C_Test_Game</name>
-	<comment>I2C_Test_Game_bsp - microblaze_0</comment>
+	<comment></comment>
 	<projects>
+		<project>standalone_bsp_0</project>
 		<project>I2C_Test_Game_bsp</project>
 	</projects>
 	<buildSpec>
