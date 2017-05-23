@@ -264,8 +264,7 @@ int sendToSlave(void) {
 	TransmitComplete = 1;
 
 	XIic_MasterSend(&IicInstance, WriteBuffer, PAGE_SIZE);
-
-	/*
+/*
 	while (1) {
 		XIic_MasterSend(&IicInstance, WriteBuffer, PAGE_SIZE);
 

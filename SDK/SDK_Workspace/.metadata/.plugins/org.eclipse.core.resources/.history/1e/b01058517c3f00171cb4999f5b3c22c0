@@ -134,7 +134,7 @@ int main()
 		return XST_FAILURE;
 	}
 
-	sendToSlave();
+	recvFromSlave(&slavePtr);
 
 	return XST_SUCCESS;
 
@@ -255,8 +255,6 @@ int sendToSlave(void) {
 		WriteBuffer[sizeof(Address) + Index] = 0xFF;
 	}
 
-	WriteBuffer[2] = 'G';
-
 	IicInstance.Stats.TxErrors = 0;
 	/*
 	 * Set the defaults.
@@ -265,14 +263,16 @@ int sendToSlave(void) {
 
 	XIic_MasterSend(&IicInstance, WriteBuffer, PAGE_SIZE);
 
-	/*
 	while (1) {
+		/*
+		 * Send the data.
+		 */
 		XIic_MasterSend(&IicInstance, WriteBuffer, PAGE_SIZE);
 
 		if ((!TransmitComplete) &&
 			(XIic_IsIicBusy(&IicInstance) == FALSE))
 			break;
-	}*/
+	}
 
 	return XST_SUCCESS;
 }
