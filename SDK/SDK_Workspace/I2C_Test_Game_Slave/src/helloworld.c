@@ -87,7 +87,11 @@ static void ReceiveHandler(XIic *InstancePtr);
 
 int main()
 {
+	u8 buf[1];
     init_platform();
+    initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
+
+    SlaveReadData(buf, sizeof(buf));
 
     return 0;
 }
