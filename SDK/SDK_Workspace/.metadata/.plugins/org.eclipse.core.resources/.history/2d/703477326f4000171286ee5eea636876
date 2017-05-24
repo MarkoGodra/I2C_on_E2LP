@@ -69,9 +69,6 @@ XIntc InterruptController;	/* The instance of the Interrupt Controller */
 u8 WriteBuffer[SEND_COUNT];	/* Write buffer for writing a page. */
 u8 ReadBuffer[RECEIVE_COUNT];	/* Read buffer for reading a page. */
 
-
-u8 buf[25];
-
 volatile u8 TransmitComplete;
 volatile u8 ReceiveComplete;
 
@@ -90,7 +87,7 @@ static void ReceiveHandler(XIic *InstancePtr);
 
 int main()
 {
-	u8 buf[2] = {0, 1};
+	u8 buf[25];
     init_platform();
     initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
 
