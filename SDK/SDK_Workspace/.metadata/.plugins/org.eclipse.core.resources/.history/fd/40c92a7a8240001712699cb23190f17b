@@ -60,7 +60,7 @@
 #define RECEIVE_COUNT		25
 #define SEND_COUNT		25
 
-#define RECV_BUFF_SIZE 2
+#define RECV_BUFF_SIZE
 
 /************************** Variable Definitions *****************************/
 
@@ -92,7 +92,7 @@ static void ReceiveHandler(XIic *InstancePtr);
 
 int main()
 {
-	u8 buf[RECV_BUFF_SIZE];
+	u8 buf[RECV_BUFF_SIZE] = {0, 1};
     init_platform();
     initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
 
@@ -214,8 +214,7 @@ int SlaveReadData(u8 *BufferPtr, u16 ByteCount)
 		return XST_FAILURE;
 	}
 
-	for (i = 0; i < RECV_BUFF_SIZE; i++)
-		BufferPtr[i] = ReadBuffer[i];
+	for (i = 0; i < )
 
 	return XST_SUCCESS;
 }
