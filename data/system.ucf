@@ -14,8 +14,13 @@ NET CLK_N LOC = "AF14"  |  IOSTANDARD = "LVDS_33";
 NET CLK_P LOC = "AD14"  |  IOSTANDARD = "LVDS_33";
 
 
+<<<<<<< HEAD
 NET axi_iic_0_Scl_pin LOC = "C5"  	|  IOSTANDARD = "LVTTL"; 	#SNAPW_0
 NET axi_iic_0_Sda_pin LOC = "C6" 	| 	IOSTANDARD = "LVTTL";   #SNAPW_1
+=======
+NET axi_iic_0_Scl_pin LOC = "C5"  	|  IOSTANDARD = "LVTTL"; 	#SCL
+NET axi_iic_0_Sda_pin LOC = "C6" 	| 	IOSTANDARD = "LVTTL";   #SDA
+>>>>>>> a6cf198ef1dfb10080c7e9fe18041e062ef5e6f5
 
 #NET my_peripheral_0_DIP_Data_pin[0] LOC = "W19"  |  IOSTANDARD = "LVCMOS33";
 #NET my_peripheral_0_DIP_Data_pin[1] LOC = "Y24"  |  IOSTANDARD = "LVCMOS33";
