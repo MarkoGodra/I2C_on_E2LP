@@ -58,7 +58,7 @@
 #define RECEIVE_COUNT		25
 #define SEND_COUNT		25
 
-#define PAGE_SIZE   16
+#define PAGE_SIZE   2
 
 typedef u8 AddressType;
 
@@ -95,7 +95,7 @@ XIntc InterruptController;	/* The instance of the Interrupt Controller */
 /*
  * Write buffer for writing a page.
  */
-u8 WriteBuffer[sizeof(AddressType) + PAGE_SIZE];
+u8 WriteBuffer[PAGE_SIZE];
 
 volatile u8 TransmitComplete;
 volatile u8 ReceiveComplete;
@@ -109,7 +109,7 @@ int main()
 
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x00, 0x0);// direct mode   0
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x04, 0x3);// display_mode  1
-	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x08, 0x1);// show frame      2
+	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 	`	0x08, 0x1);// show frame      2
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x0C, 0x1);// font size       3
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x10, 0xFFFFFF);// foreground 4
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x14, 0x0000FF);// background color 5
@@ -124,7 +124,8 @@ int main()
 	return 0;
 */
 	int Status;
-	u8 slavePtr;
+	//u8 slavePtr;
+
 
 	/*
 	 * Call the TempSensorExample.
@@ -239,40 +240,17 @@ int recvFromSlave(u8* slavePtr) {
 
 int sendToSlave(void) {
 	u8 Index;
-	AddressType Address = SLAVE_ADDRESS;
 
-	/*
-	 * Initialize the data to write and the read buffer.
-	 */
-	if (sizeof(Address) == 1) {
-		WriteBuffer[0] = (u8) (Address);
-	}
-	else {
-		WriteBuffer[0] = (u8) (Address >> 8);
-		WriteBuffer[1] = (u8) (Address);
-	}
 	for (Index = 0; Index < PAGE_SIZE; Index++) {
-		WriteBuffer[sizeof(Address) + Index] = 0xFF;
+		WriteBuffer[Index] = 0xFF;
 	}
-
-	WriteBuffer[2] = 'G';
 
 	IicInstance.Stats.TxErrors = 0;
-	/*
-	 * Set the defaults.
-	 */
-	TransmitComplete = 1;
+
 
 	XIic_MasterSend(&IicInstance, WriteBuffer, PAGE_SIZE);
-
-	/*
-	while (1) {
-		XIic_MasterSend(&IicInstance, WriteBuffer, PAGE_SIZE);
-
-		if ((!TransmitComplete) &&
-			(XIic_IsIicBusy(&IicInstance) == FALSE))
-			break;
-	}*/
+	while(XIic_IsIicBusy(&IicInstance)){
+	}
 
 	return XST_SUCCESS;
 }
