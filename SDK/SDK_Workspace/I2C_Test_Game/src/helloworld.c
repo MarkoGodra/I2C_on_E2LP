@@ -124,7 +124,7 @@ int main()
 	return 0;
 */
 	int Status;
-	//u8 slavePtr;
+	u8 slavePtr[2];
 
 
 	/*
@@ -137,7 +137,9 @@ int main()
 
 	sendToSlave();
 
-	return XST_SUCCESS;
+	recvFromSlave(slavePtr);
+
+ 	return XST_SUCCESS;
 
 }
 
@@ -189,7 +191,7 @@ int initIICMaster(u16 IicDeviceId, u8 slaveAddress) {
 	return Status;
 }
 
-int recvFromSlave(u8* slavePtr) {
+int recvFromSlave(u8* slaveDataPtr) {
 	int Status;
 	/*
 	 * Clear updated flags such that they can be polled to indicate
@@ -205,7 +207,7 @@ int recvFromSlave(u8* slavePtr) {
 	 * on the IIC interface, ignore the return value since this example is
 	 * a single master system such that the IIC bus should not ever be busy
 	 */
-	(void)XIic_MasterRecv(&IicInstance, slavePtr, 1);
+	(void)XIic_MasterRecv(&IicInstance, slaveDataPtr, 2);
 
 	/*
 	 * The message is being received from the temperature sensor,

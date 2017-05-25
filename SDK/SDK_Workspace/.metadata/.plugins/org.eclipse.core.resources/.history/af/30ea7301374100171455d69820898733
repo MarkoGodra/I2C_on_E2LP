@@ -101,7 +101,7 @@ int main()
 
     SlaveReadData(buf, sizeof(buf));
 
-    SlaveWriteData(2);
+    SlaveWriteData(1);
 
     return 0;
 }
@@ -199,7 +199,7 @@ int SlaveReadData(u8 *BufferPtr, u16 ByteCount)
 	/*
 	 * Wait for AAS interrupt and completion of data reception.
 	 */
-	while ((XIic_IsIicBusy(&IicInstance) == TRUE) || ReceiveComplete) {
+	while ((ReceiveComplete) || (XIic_IsIicBusy(&IicInstance) == TRUE)) {
 		if (SlaveRead) {
 			XIic_SlaveRecv(&IicInstance, ReadBuffer, RECEIVE_COUNT);
 			SlaveRead = 0;
@@ -260,7 +260,7 @@ int SlaveWriteData(u16 ByteCount)
 	/*
 	 * Wait for AAS interrupt and transmission to complete.
 	 */
-	while ((XIic_IsIicBusy(&IicInstance) == TRUE) || TransmitComplete) {
+	while ((XIic_IsIicBusy(&IicInstance) == TRUE)) {
 		if (SlaveWrite) {
 			XIic_SlaveSend(&IicInstance, WriteBuffer, SEND_COUNT);
 			SlaveWrite = 0;

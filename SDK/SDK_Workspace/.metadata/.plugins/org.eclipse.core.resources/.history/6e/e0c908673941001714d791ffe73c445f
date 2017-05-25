@@ -260,7 +260,7 @@ int SlaveWriteData(u16 ByteCount)
 	/*
 	 * Wait for AAS interrupt and transmission to complete.
 	 */
-	while ((XIic_IsIicBusy(&IicInstance) == TRUE) || TransmitComplete) {
+	while ((XIic_IsIicBusy(&IicInstance) == TRUE)) {
 		if (SlaveWrite) {
 			XIic_SlaveSend(&IicInstance, WriteBuffer, SEND_COUNT);
 			SlaveWrite = 0;
