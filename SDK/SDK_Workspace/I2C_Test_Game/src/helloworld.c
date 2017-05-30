@@ -62,6 +62,12 @@
 
 typedef u8 AddressType;
 
+#define UP 15
+#define DOWN 0b00000001
+#define LEFT 0b00001000
+#define RIGHT 0b00000010
+#define CENTER 0b00000100
+
 /************************** Function Prototypes ******************************/
 
 int initIICMaster(u16 IicDeviceId, u8 slaveAddress);
@@ -104,7 +110,21 @@ volatile u8 BusNotBusy;
 int main()
 {
 
+	typedef enum {
+		IDLE,
+		LEFT_PRESSED,
+		RIGHT_PRESSED,
+		CENTER_PRESSED,
+		DOWN_PRESSED,
+		UP_PRESSED
+	} state_t;
+
+
+	state_t state = IDLE;
+	int button;
+
 	init_platform();
+	
 	/*unsigned char string_s[] = "LPRS 2\n";
 
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x00, 0x0);// direct mode   0
@@ -125,6 +145,25 @@ int main()
 */
 	int Status;
 	u8 slavePtr[2];
+
+	while(1){
+		button = Xil_In32LE(XPAR_MY_PERIPHERAL_0_BASEADDR);
+
+		if(button == UP) {
+			state = UP_PRESSED;
+		}else if ((button & DOWN) == 0) {
+			state = DOWN_PRESSED;
+		}else if ((button & RIGHT) == 0) {
+			state = RIGHT_PRESSED;
+		}else if ((button & LEFT) == 0) {
+			state = LEFT_PRESSED;
+		}else if ((button & CENTER) == 0) {
+			state = CENTER_PRESSED;
+		}else {
+			state = IDLE;
+		}
+
+	}
 
 
 	/*
