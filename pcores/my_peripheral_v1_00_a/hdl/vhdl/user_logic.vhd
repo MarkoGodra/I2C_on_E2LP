@@ -195,7 +195,7 @@ begin
   end process SLAVE_REG_WRITE_PROC;
 
   -- implement slave model software accessible register(s) read mux
-  SLAVE_REG_READ_PROC : process( slv_reg_read_sel, slv_reg0, interrupt_reg ) is
+  SLAVE_REG_READ_PROC : process( slv_reg_read_sel, slv_reg0) is
   begin
 
     case slv_reg_read_sel is

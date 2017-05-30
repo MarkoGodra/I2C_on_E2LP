@@ -207,6 +207,11 @@
 /******************************************************************/
 
 
+/* Definitions for peripheral MY_PERIPHERAL_0 */
+#define XPAR_MY_PERIPHERAL_0_BASEADDR 0x7DE00000
+#define XPAR_MY_PERIPHERAL_0_HIGHADDR 0x7DE0FFFF
+
+
 /* Definitions for peripheral VGA_PERIPH_MEM_0 */
 #define XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR 0x44000000
 #define XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_HIGHADDR 0x47FFFFFF

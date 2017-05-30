@@ -29,6 +29,8 @@
  PORT axi_iic_0_Gpo_pin = axi_iic_0_Gpo, DIR = O
  PORT axi_iic_0_Sda_pin = axi_iic_0_Sda, DIR = IO
  PORT axi_iic_0_Scl_pin = axi_iic_0_Scl, DIR = IO
+ PORT my_peripheral_0_DIP_Data_pin = net_my_peripheral_0_DIP_Data_pin, DIR = I, VEC = [7:0]
+ PORT my_peripheral_0_LED_Data_pin = my_peripheral_0_LED_Data, DIR = O, VEC = [7:0]
 
 
 # PORT vga_periph_0_display_mode_i_pin = vga_periph_0_display_mode_i, DIR = I, VEC = [1:0]
@@ -202,5 +204,16 @@ BEGIN axi_intc
  BUS_INTERFACE INTERRUPT = axi_intc_0_INTERRUPT
  PORT S_AXI_ACLK = clk_100_0000MHz
  PORT Intr = axi_iic_0_IIC2INTC_Irpt
+END
+
+BEGIN my_peripheral
+ PARAMETER INSTANCE = my_peripheral_0
+ PARAMETER HW_VER = 1.00.a
+ PARAMETER C_BASEADDR = 0x7de00000
+ PARAMETER C_HIGHADDR = 0x7de0ffff
+ BUS_INTERFACE S_AXI = axi4lite_0
+ PORT S_AXI_ACLK = clk_100_0000MHz
+ PORT DIP_Data = net_my_peripheral_0_DIP_Data_pin
+ PORT LED_Data = my_peripheral_0_LED_Data
 END
 
