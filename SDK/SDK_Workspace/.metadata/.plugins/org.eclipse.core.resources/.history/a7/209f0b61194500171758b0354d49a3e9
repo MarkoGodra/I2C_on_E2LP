@@ -117,6 +117,7 @@ int main()
     initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
 
     while(1){
+
     	button = Xil_In32LE(XPAR_MY_PERIPHERAL_0_BASEADDR);
 
     	if(button == UP) {
@@ -132,6 +133,7 @@ int main()
     	}else {
     		state = IDLE;
     	}
+
     }
 
 
