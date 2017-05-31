@@ -110,114 +110,108 @@ int main()
 			UP_PRESSED
 		} state_t;
 
-	while(1){
-		u8 simbol;
-		unsigned char string_s[] = "ODABERITE SIMBOL\n";
-		unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
+	u8 simbol;
+	unsigned char string_s[] = "ODABERITE SIMBOL\n";
+	unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
 
 
-		state_t state = IDLE;
-		state_t p_state = IDLE;
-		int button;
-		int i;
+	state_t state = IDLE;
+	state_t p_state = IDLE;
+	int button;
+	int i;
 
-		init_platform();
-		initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
+	init_platform();
+    initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
 
-		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x00, 0x0);// direct mode   0
-		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x04, 0x3);// display_mode  1
-		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x08, 0x1);// show frame      2
-		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x0C, 0x1);// font size       3
-		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x10, 0xFFFFFF);// foreground 4
-		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x14, 0x0000FF);// background color 5
-		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x18, 0xFF0000);// frame color      6
+	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x00, 0x0);// direct mode   0
+	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x04, 0x3);// display_mode  1
+	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x08, 0x1);// show frame      2
+	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x0C, 0x1);// font size       3
+	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x10, 0xFFFFFF);// foreground 4
+	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x14, 0x0000FF);// background color 5
+	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x18, 0xFF0000);// frame color      6
 
-		clear_text_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
-		clear_graphics_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
-		//draw_square(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
+	clear_text_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
+	clear_graphics_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
+	//draw_square(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
 
-		set_cursor(350);
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "CEKAM", 5);
+	set_cursor(350);
+	print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "CEKAM", 5);
 
-		set_cursor(2910);
+	set_cursor(2910);
 		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 2", 7);
 
-		SlaveReadData(buf, sizeof(buf));
+	SlaveReadData(buf, sizeof(buf));
 
-		set_cursor(350);
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_s, 16);
+	set_cursor(350);
+	print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_s, 16);
 
 
-		while(1){
-			button = Xil_In32LE(XPAR_MY_PERIPHERAL_0_BASEADDR);
+	while(1){
+		button = Xil_In32LE(XPAR_MY_PERIPHERAL_0_BASEADDR);
 
-			if(button == UP) {
-				state = UP_PRESSED;
-			}else if ((button & DOWN) == 0) {
-				state = DOWN_PRESSED;
-			}else if ((button & RIGHT) == 0) {
-			state = RIGHT_PRESSED;
-			}else if ((button & LEFT) == 0) {
-				state = LEFT_PRESSED;
-			}else if ((button & CENTER) == 0) {
-				state = CENTER_PRESSED;
-			}else {
-				state = IDLE;
-			}
-
-			if(p_state != state){
-				break;
-			}
+		if(button == UP) {
+			state = UP_PRESSED;
+		}else if ((button & DOWN) == 0) {
+			state = DOWN_PRESSED;
+		}else if ((button & RIGHT) == 0) {
+		state = RIGHT_PRESSED;
+		}else if ((button & LEFT) == 0) {
+			state = LEFT_PRESSED;
+		}else if ((button & CENTER) == 0) {
+			state = CENTER_PRESSED;
+		}else {
+			state = IDLE;
 		}
 
-		set_cursor(350);
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_odabrali, 19);
-		set_cursor(990);
-		switch(state){
-			case UP_PRESSED :
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "MAKAZE", 6);
-				simbol = 'M';
-				break;
-			case LEFT_PRESSED :
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "PAPIR", 5);
-				simbol = 'P';
-				break;
-			case RIGHT_PRESSED :
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "KAMEN", 5);
-				simbol = 'K';
-				break;
+		if(p_state != state){
+			break;
 		}
+	}
+
+	set_cursor(350);
+	print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_odabrali, 19);
+	set_cursor(990);
+	switch(state){
+		case UP_PRESSED :
+			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "MAKAZE", 6);
+			simbol = 'M';
+			break;
+		case LEFT_PRESSED :
+			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "PAPIR", 5);
+			simbol = 'P';
+			break;
+		case RIGHT_PRESSED :
+			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "KAMEN", 5);
+			simbol = 'K';
+			break;
+	}
 
 
 
-		SlaveWriteData(simbol);
+	SlaveWriteData(simbol);
 
 
-		SlaveReadData(win, sizeof(win));
+	SlaveReadData(win, sizeof(win));
 
-		int winner = win[0];
+	int winner = win[0];
 
-		switch(winner){
-			case 0 :
-				set_cursor(1630);
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "NERESENO", 8);
-				break;
-			case 1 :
-				set_cursor(1630);
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 1 POBEDJUJE", 17);
-				break;
-			case 2 :
-				set_cursor(1630);
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 2 POBEDJUJE", 17);
-				break;
-
-		}
-
-		for (i = -5000000; i < 5000000; i++){
-
-		}
+	switch(winner){
+		case 0 :
+			set_cursor(1630);
+			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "NERESENO", 8);
+			break;
+		case 1 :
+			set_cursor(1630);
+			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 1 POBEDJUJE", 17);
+			break;
+		case 2 :
+			set_cursor(1630);
+			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 2 POBEDJUJE", 17);
+			break;
 
 	}
+
 
 	return 0;
 }
