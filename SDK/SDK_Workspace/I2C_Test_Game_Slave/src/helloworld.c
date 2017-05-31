@@ -102,27 +102,28 @@ int main()
 	u8 buf[RECV_BUFF_SIZE];
 	u8 win[1];
 	typedef enum {
-			IDLE,
-			LEFT_PRESSED,
-			RIGHT_PRESSED,
-			CENTER_PRESSED,
-			DOWN_PRESSED,
-			UP_PRESSED
-		} state_t;
+		IDLE,
+		LEFT_PRESSED,
+		RIGHT_PRESSED,
+		CENTER_PRESSED,
+		DOWN_PRESSED,
+		UP_PRESSED
+	} state_t;
+
+	init_platform();
+	initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
+	u8 simbol;
+	unsigned char string_s[] = "ODABERITE SIMBOL\n";
+	unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
+	state_t state = IDLE;
+	state_t p_state = IDLE;
+	int button;
+	int i;
 
 	while(1){
-		u8 simbol;
-		unsigned char string_s[] = "ODABERITE SIMBOL\n";
-		unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
 
-
-		state_t state = IDLE;
-		state_t p_state = IDLE;
-		int button;
-		int i;
-
-		init_platform();
-		initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
+		state = IDLE;
+		p_state = IDLE;
 
 		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x00, 0x0);// direct mode   0
 		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x04, 0x3);// display_mode  1
@@ -213,9 +214,11 @@ int main()
 
 		}
 
-		for (i = -5000000; i < 5000000; i++){
+		for (i = -10000000; i < 10000000; i++){
 
 		}
+
+		i = 0;
 
 	}
 

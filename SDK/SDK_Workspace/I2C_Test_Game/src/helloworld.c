@@ -119,29 +119,29 @@ int main()
 		UP_PRESSED
 	} state_t;
 
+	unsigned char string_s[] = "ODABERITE SIMBOL\n";
+	unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
+	u8 winner;
+
+	init_platform();
+	int Status;
+	u8 slavePtr[2];
+	state_t p_state = IDLE;
+	state_t state = IDLE;
+	int button;
+	u8 slaveSym;
+	int i;
+	u8 simbol;
+
+	Status =  initIICMaster(IIC_DEVICE_ID, SLAVE_ADDRESS);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
+
 	while(1){
 
-
-		int Status;
-		u8 slavePtr[2];
-		state_t p_state = IDLE;
-		state_t state = IDLE;
-		int button;
-		u8 slaveSym;
-		int i;
-		u8 simbol;
-
-		init_platform();
-
-		unsigned char string_s[] = "ODABERITE SIMBOL\n";
-		unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
-		u8 winner;
-
-		Status =  initIICMaster(IIC_DEVICE_ID, SLAVE_ADDRESS);
-			if (Status != XST_SUCCESS) {
-				return XST_FAILURE;
-			}
-
+		state = IDLE;
+		state = IDLE;
 
 		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x00, 0x0);// direct mode   0
 		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x04, 0x3);// display_mode  1
@@ -247,13 +247,20 @@ int main()
 			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
 		}
 
-		for(i = -1000000; i < 1000000; i++){
+		for(i = 0; i < 1000000; i++){
 
 		}
 
 		sendToSlave(winner);
 
+		for(i = -10000000; i < 10000000; i++){
+
+				}
+
+		i = 0;
+
 	}
+
 
  	return 0;
 
