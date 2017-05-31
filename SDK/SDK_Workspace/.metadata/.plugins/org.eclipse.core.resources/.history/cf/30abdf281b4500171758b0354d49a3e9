@@ -63,6 +63,12 @@
 
 #define RECV_BUFF_SIZE 2
 
+#define UP 15
+#define DOWN 0b00000001
+#define LEFT 0b00001000
+#define RIGHT 0b00000010
+#define CENTER 0b00000100
+
 /************************** Variable Definitions *****************************/
 
 XIic IicInstance;		/* The instance of the IIC device. */
@@ -94,14 +100,45 @@ static void ReceiveHandler(XIic *InstancePtr);
 int main()
 {
 	u8 buf[RECV_BUFF_SIZE];
+	typedef enum {
+			IDLE,
+			LEFT_PRESSED,
+			RIGHT_PRESSED,
+			CENTER_PRESSED,
+			DOWN_PRESSED,
+			UP_PRESSED
+		} state_t;
 
+
+	state_t state = IDLE;
+	int button;
 
 	init_platform();
     initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
 
+    while(1){
+    	button = Xil_In32LE(XPAR_MY_PERIPHERAL_0_BASEADDR);
+
+    	if(button == UP) {
+    		state = UP_PRESSED;
+    	}else if ((button & DOWN) == 0) {
+    		state = DOWN_PRESSED;
+    	}else if ((button & RIGHT) == 0) {
+    		state = RIGHT_PRESSED;
+    	}else if ((button & LEFT) == 0) {
+    		state = LEFT_PRESSED;
+    	}else if ((button & CENTER) == 0) {
+    		state = CENTER_PRESSED;
+    	}else {
+    		state = IDLE;
+    	}
+    }
+
+
+
     SlaveReadData(buf, sizeof(buf));
 
-    SlaveWriteData(1);
+    SlaveWriteData(2);
 
     return 0;
 }
@@ -199,7 +236,7 @@ int SlaveReadData(u8 *BufferPtr, u16 ByteCount)
 	/*
 	 * Wait for AAS interrupt and completion of data reception.
 	 */
-	while ((ReceiveComplete) || (XIic_IsIicBusy(&IicInstance) == TRUE)) {
+	while ((XIic_IsIicBusy(&IicInstance) == TRUE) || ReceiveComplete) {
 		if (SlaveRead) {
 			XIic_SlaveRecv(&IicInstance, ReadBuffer, RECEIVE_COUNT);
 			SlaveRead = 0;
@@ -260,7 +297,7 @@ int SlaveWriteData(u16 ByteCount)
 	/*
 	 * Wait for AAS interrupt and transmission to complete.
 	 */
-	while ((XIic_IsIicBusy(&IicInstance) == TRUE)) {
+	while ((XIic_IsIicBusy(&IicInstance) == TRUE) || TransmitComplete) {
 		if (SlaveWrite) {
 			XIic_SlaveSend(&IicInstance, WriteBuffer, SEND_COUNT);
 			SlaveWrite = 0;

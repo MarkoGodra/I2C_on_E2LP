@@ -116,29 +116,30 @@ int main()
 	init_platform();
     initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
 
-    while(1){
-    	button = Xil_In32LE(XPAR_MY_PERIPHERAL_0_BASEADDR);
-
-    	if(button == UP) {
-    		state = UP_PRESSED;
-    	}else if ((button & DOWN) == 0) {
-    		state = DOWN_PRESSED;
-    	}else if ((button & RIGHT) == 0) {
-    		state = RIGHT_PRESSED;
-    	}else if ((button & LEFT) == 0) {
-    		state = LEFT_PRESSED;
-    	}else if ((button & CENTER) == 0) {
-    		state = CENTER_PRESSED;
-    	}else {
-    		state = IDLE;
-    	}
-    }
+//    while(1){
+//    	button = Xil_In32LE(XPAR_MY_PERIPHERAL_0_BASEADDR);
+//
+//    	if(button == UP) {
+//    		state = UP_PRESSED;
+//    	}else if ((button & DOWN) == 0) {
+//    		state = DOWN_PRESSED;
+//    	}else if ((button & RIGHT) == 0) {
+//    		state = RIGHT_PRESSED;
+//    	}else if ((button & LEFT) == 0) {
+//    		state = LEFT_PRESSED;
+//    	}else if ((button & CENTER) == 0) {
+//    		state = CENTER_PRESSED;
+//    	}else {
+//    		state = IDLE;
+//    	}
+//    }
 
 
 
     SlaveReadData(buf, sizeof(buf));
 
     SlaveWriteData(2);
+
 
     return 0;
 }

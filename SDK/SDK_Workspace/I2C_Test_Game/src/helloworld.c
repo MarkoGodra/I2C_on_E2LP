@@ -72,7 +72,7 @@ typedef u8 AddressType;
 
 int initIICMaster(u16 IicDeviceId, u8 slaveAddress);
 int recvFromSlave(u8* slavePtr);
-int sendToSlave(void);
+int sendToSlave(u8 simbol);
 static int SetupInterruptSystem(XIic * IicInstPtr);
 static void StatusHandler(void *CallbackRef, int Status);
 static void SendHandler(void *CallbackRef, int ByteCount);
@@ -119,17 +119,26 @@ int main()
 		UP_PRESSED
 	} state_t;
 
-
+	int Status;
+	u8 slavePtr[2];
+	state_t p_state = IDLE;
 	state_t state = IDLE;
 	int button;
 
+	u8 simbol;
 	init_platform();
-	
-	/*unsigned char string_s[] = "LPRS 2\n";
+	unsigned char string_s[] = "ODABERITE SIMBOL\n";
+	unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
+
+	Status =  initIICMaster(IIC_DEVICE_ID, SLAVE_ADDRESS);
+		if (Status != XST_SUCCESS) {
+			return XST_FAILURE;
+		}
+
 
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x00, 0x0);// direct mode   0
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x04, 0x3);// display_mode  1
-	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 	`	0x08, 0x1);// show frame      2
+	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x08, 0x1);// show frame      2
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x0C, 0x1);// font size       3
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x10, 0xFFFFFF);// foreground 4
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x14, 0x0000FF);// background color 5
@@ -137,14 +146,10 @@ int main()
 
 	clear_text_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
 	clear_graphics_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
-	draw_square(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
+	//draw_square(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
 	set_cursor(350);
-	print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_s, 6);
+	print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_s, 16);
 
-	return 0;
-*/
-	int Status;
-	u8 slavePtr[2];
 
 	while(1){
 		button = Xil_In32LE(XPAR_MY_PERIPHERAL_0_BASEADDR);
@@ -154,7 +159,7 @@ int main()
 		}else if ((button & DOWN) == 0) {
 			state = DOWN_PRESSED;
 		}else if ((button & RIGHT) == 0) {
-			state = RIGHT_PRESSED;
+		state = RIGHT_PRESSED;
 		}else if ((button & LEFT) == 0) {
 			state = LEFT_PRESSED;
 		}else if ((button & CENTER) == 0) {
@@ -163,18 +168,31 @@ int main()
 			state = IDLE;
 		}
 
+		if(p_state != state){
+			break;
+		}
+	}
+
+	set_cursor(350);
+	print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_odabrali, 19);
+	set_cursor(990);
+	switch(state){
+		case UP_PRESSED :
+			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "MAKAZE", 6);
+			simbol = 'M';
+			break;
+		case LEFT_PRESSED :
+			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "PAPIR", 5);
+			simbol = 'P';
+			break;
+		case RIGHT_PRESSED :
+			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "KAMEN", 5);
+			simbol = 'K';
+			break;
 	}
 
 
-	/*
-	 * Call the TempSensorExample.
-	 */
-	Status =  initIICMaster(IIC_DEVICE_ID, SLAVE_ADDRESS);
-	if (Status != XST_SUCCESS) {
-		return XST_FAILURE;
-	}
-
-	sendToSlave();
+	sendToSlave(simbol);
 
 	recvFromSlave(slavePtr);
 
@@ -279,12 +297,13 @@ int recvFromSlave(u8* slaveDataPtr) {
 	return Status;
 }
 
-int sendToSlave(void) {
+int sendToSlave(u8 simbol) {
 	u8 Index;
 
-	for (Index = 0; Index < PAGE_SIZE; Index++) {
-		WriteBuffer[Index] = 'G';
-	}
+//	for (Index = 0; Index < PAGE_SIZE; Index++) {
+//		WriteBuffer[Index] = 'G';
+//	}
+	WriteBuffer[0] = simbol;
 
 	IicInstance.Stats.TxErrors = 0;
 
