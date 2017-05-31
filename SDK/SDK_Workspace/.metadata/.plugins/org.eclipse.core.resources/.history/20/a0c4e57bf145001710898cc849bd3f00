@@ -89,7 +89,7 @@ volatile u8 SlaveWrite;
 
 /************************** Function Prototypes ******************************/
 
-int SlaveWriteData(u8 simbol);
+int SlaveWriteData(u16 ByteCount, u8 simbol);
 int SlaveReadData(u8 *BufferPtr, u16 ByteCount);
 int initIICSlave(u16 IicDeviceId, u8 slaveAddress);
 static int SetupInterruptSystem(XIic * IicInstPtr);
@@ -181,7 +181,9 @@ int main()
 
 
 
-    SlaveWriteData(simbol);
+
+
+    SlaveWriteData(1, simbol);
 
 
     return 0;
@@ -319,7 +321,7 @@ int SlaveReadData(u8 *BufferPtr, u16 ByteCount)
 * @note		None.
 *
 ******************************************************************************/
-int SlaveWriteData(u8 simbol)
+int SlaveWriteData(u16 ByteCount, u8 simbol)
 {
 	int Status;
 
@@ -334,7 +336,8 @@ int SlaveWriteData(u8 simbol)
 	XIic_IntrGlobalEnable(IicInstance.BaseAddress);
 
 
-	WriteBuffer[0] = simbol;
+	WriteBuffer[0] = 'G';
+	WriteBuffer[1] = 'B';
 
 
 	/*
