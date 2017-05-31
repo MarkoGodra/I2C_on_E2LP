@@ -40,6 +40,8 @@
 #include "xintc.h"
 #include "xil_exception.h"
 
+/************************** Constant Definitions *****************************/
+
 /*
  * The following constants map to the XPAR parameters created in the
  * xparameters.h file. They are defined here such that a user can easily
@@ -56,11 +58,10 @@
 #define SLAVE_ADDRESS		0x70	/* 0xE0 as an 8 bit number. */
 
 #define RECEIVE_COUNT		25
-#define SEND_COUNT		25
+//#define SEND_COUNT		25
+#define SEND_COUNT		2
 
-#define PAGE_SIZE   2
-
-typedef u8 AddressType;
+#define RECV_BUFF_SIZE 2
 
 #define UP 15
 #define DOWN 0b00000001
@@ -68,75 +69,58 @@ typedef u8 AddressType;
 #define RIGHT 0b00000010
 #define CENTER 0b00000100
 
-/************************** Function Prototypes ******************************/
-
-int initIICMaster(u16 IicDeviceId, u8 slaveAddress);
-int recvFromSlave(u8* slavePtr);
-int sendToSlave(u8 simbol);
-static int SetupInterruptSystem(XIic * IicInstPtr);
-static void StatusHandler(void *CallbackRef, int Status);
-static void SendHandler(void *CallbackRef, int ByteCount);
-static void RecvHandler(void *CallbackRef, int ByteCount);
-
 /************************** Variable Definitions *****************************/
-
-/*
- * The following structure contains fields that are used with the callbacks
- * (handlers) of the IIC driver. The driver asynchronously calls handlers
- * when abnormal events occur or when data has been sent or received. This
- * structure must be volatile to work when the code is optimized.
- */
-volatile struct {
-	int  EventStatus;
-	int  RemainingRecvBytes;
-	int  RemainingSendBytes;
-	int EventStatusUpdated;
-	int RecvBytesUpdated;
-	int SendBytesUpdated;
-} HandlerInfo;
 
 XIic IicInstance;		/* The instance of the IIC device. */
 XIntc InterruptController;	/* The instance of the Interrupt Controller */
 
-/*
- * Write buffer for writing a page.
- */
-u8 WriteBuffer[PAGE_SIZE];
+
+u8 WriteBuffer[SEND_COUNT];	/* Write buffer for writing a page. */
+u8 ReadBuffer[RECEIVE_COUNT];	/* Read buffer for reading a page. */
+
+
+u8 buf[25];
 
 volatile u8 TransmitComplete;
 volatile u8 ReceiveComplete;
-volatile u8 BusNotBusy;
+
+volatile u8 SlaveRead;
+volatile u8 SlaveWrite;
+
+/************************** Function Prototypes ******************************/
+
+int SlaveWriteData(u8 simbol);
+int SlaveReadData(u8 *BufferPtr, u16 ByteCount);
+int initIICSlave(u16 IicDeviceId, u8 slaveAddress);
+static int SetupInterruptSystem(XIic * IicInstPtr);
+static void StatusHandler(XIic *InstancePtr, int Event);
+static void SendHandler(XIic *InstancePtr);
+static void ReceiveHandler(XIic *InstancePtr);
 
 int main()
 {
-
+	u8 buf[RECV_BUFF_SIZE];
+	u8 win[1];
 	typedef enum {
-		IDLE,
-		LEFT_PRESSED,
-		RIGHT_PRESSED,
-		CENTER_PRESSED,
-		DOWN_PRESSED,
-		UP_PRESSED
-	} state_t;
+			IDLE,
+			LEFT_PRESSED,
+			RIGHT_PRESSED,
+			CENTER_PRESSED,
+			DOWN_PRESSED,
+			UP_PRESSED
+		} state_t;
 
-	int Status;
-	u8 slavePtr[2];
-	state_t p_state = IDLE;
-	state_t state = IDLE;
-	int button;
-	u8 slaveSym;
-	int i;
 	u8 simbol;
-	init_platform();
 	unsigned char string_s[] = "ODABERITE SIMBOL\n";
 	unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
-	u8 winner;
 
-	Status =  initIICMaster(IIC_DEVICE_ID, SLAVE_ADDRESS);
-		if (Status != XST_SUCCESS) {
-			return XST_FAILURE;
-		}
 
+	state_t state = IDLE;
+	state_t p_state = IDLE;
+	int button;
+
+	init_platform();
+    initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
 
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x00, 0x0);// direct mode   0
 	VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x04, 0x3);// display_mode  1
@@ -149,6 +133,12 @@ int main()
 	clear_text_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
 	clear_graphics_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
 	//draw_square(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
+
+	set_cursor(350);
+	print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "CEKAM", 5);
+
+	SlaveReadData(buf, sizeof(buf));
+
 	set_cursor(350);
 	print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_s, 16);
 
@@ -193,67 +183,25 @@ int main()
 			break;
 	}
 
-	sendToSlave(simbol);
 
-	for(i = 0; i < 100000; i++){
 
-	}
+	SlaveWriteData(simbol);
 
-	recvFromSlave(slavePtr);
+	SlaveReadData(win, sizeof(win));
 
-	slaveSym = slavePtr[0];
 
-	if(simbol == slaveSym){
-		set_cursor(1630);
-		const u8 rezultat[] = "NERESENO\n";
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 8);
-		winner = 0;
-	}else if(simbol == 'K' && slaveSym == 'P'){
-		set_cursor(1630);
-		const u8 rezultat[] = "IGRAC 2 POBEDJUJE\n";
-		winner = 2;
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
-	}else if(simbol == 'K' && slaveSym == 'M'){
-		set_cursor(1630);
-		winner = 1;
-		const u8 rezultat[] = "IGRAC 1 POBEDJUJE\n";
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
-	}else if(simbol == 'P' && slaveSym == 'M'){
-		set_cursor(1630);
-		winner = 2;
-		const u8 rezultat[] = "IGRAC 2 POBEDJUJE\n";
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
-	}else if(simbol == 'P' && slaveSym == 'K'){
-		set_cursor(1630);
-		winner = 1;
-		const u8 rezultat[] = "IGRAC 1 POBEDJUJE\n";
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
-	}else if(simbol == 'M' && slaveSym == 'K'){
-		set_cursor(1630);
-		winner = 2;
-		const u8 rezultat[] = "IGRAC 2 POBEDJUJE\n";
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
-	}else if(simbol == 'M' && slaveSym == 'P'){
-		set_cursor(1630);
-		winner = 2;
-		const u8 rezultat[] = "IGRAC 1 POBEDJUJE\n";
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
-	}
-
-	sendToSlave(winner);
-
- 	return XST_SUCCESS;
-
+	return 0;
 }
 
-int initIICMaster(u16 IicDeviceId, u8 slaveAddress) {
+int initIICSlave(u16 IicDeviceId, u8 slaveAddress){
+
 	int Status;
 	XIic_Config *ConfigPtr;	/* Pointer to configuration data */
 
 	/*
 	 * Initialize the IIC driver so that it is ready to use.
 	 */
-	ConfigPtr = XIic_LookupConfig(IicDeviceId);
+	ConfigPtr = XIic_LookupConfig(IIC_DEVICE_ID);
 	if (ConfigPtr == NULL) {
 		return XST_FAILURE;
 	}
@@ -264,19 +212,8 @@ int initIICMaster(u16 IicDeviceId, u8 slaveAddress) {
 		return XST_FAILURE;
 	}
 
-
 	/*
-	 * Setup handler to process the asynchronous events which occur,
-	 * the driver is only interrupt driven such that this must be
-	 * done prior to starting the device.
-	 */
-	XIic_SetRecvHandler(&IicInstance, (void *)&HandlerInfo, RecvHandler);
-	XIic_SetSendHandler(&IicInstance, (void *)&HandlerInfo, SendHandler);
-	XIic_SetStatusHandler(&IicInstance, (void *)&HandlerInfo,
-					StatusHandler);
-
-	/*
-	 * Connect the ISR to the interrupt and enable interrupts.
+	 * Setup the Interrupt System.
 	 */
 	Status = SetupInterruptSystem(&IicInstance);
 	if (Status != XST_SUCCESS) {
@@ -284,77 +221,149 @@ int initIICMaster(u16 IicDeviceId, u8 slaveAddress) {
 	}
 
 	/*
-	 * Start the IIC driver such that it is ready to send and
-	 * receive messages on the IIC interface, set the address
-	 * to send to which is the temperature sensor address
+	 * Include the Slave functions.
 	 */
-	XIic_Start(&IicInstance);
-	XIic_SetAddress(&IicInstance, XII_ADDR_TO_SEND_TYPE, slaveAddress);
-
-	return Status;
-}
-
-int recvFromSlave(u8* slaveDataPtr) {
-	int Status;
-	/*
-	 * Clear updated flags such that they can be polled to indicate
-	 * when the handler information has changed asynchronously and
-	 * initialize the status which will be returned to a default value
-	 */
-	HandlerInfo.EventStatusUpdated = FALSE;
-	HandlerInfo.RecvBytesUpdated = FALSE;
-	Status = XST_FAILURE;
+	XIic_SlaveInclude();
 
 	/*
-	 * Attempt to receive a byte of data from the temperature sensor
-	 * on the IIC interface, ignore the return value since this example is
-	 * a single master system such that the IIC bus should not ever be busy
+	 * Set the Transmit, Receive and Status Handlers.
 	 */
-	(void)XIic_MasterRecv(&IicInstance, slaveDataPtr, 2);
+	XIic_SetStatusHandler(&IicInstance, &IicInstance,
+				  (XIic_StatusHandler) StatusHandler);
+	XIic_SetSendHandler(&IicInstance, &IicInstance,
+				(XIic_Handler) SendHandler);
+	XIic_SetRecvHandler(&IicInstance, &IicInstance,
+				(XIic_Handler) ReceiveHandler);
 
 	/*
-	 * The message is being received from the temperature sensor,
-	 * wait for it to complete by polling the information that is
-	 * updated asynchronously by interrupt processing
+	 * Start the IIC device.
 	 */
-	while(1) {
-		if(HandlerInfo.RecvBytesUpdated == TRUE) {
-			/*
-			 * The device information has been updated for receive
-			 * processing,if all bytes received (1), indicate
-			 * success
-			 */
-			if (HandlerInfo.RemainingRecvBytes == 0) {
-				Status = XST_SUCCESS;
-			}
-			break;
-		}
+	Status = XIic_Start(&IicInstance);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
 
-		/*
-		 * Any event status which occurs indicates there was an error,
-		 * so return unsuccessful, for this example there should be no
-		 * status events since there is a single master on the bus
-		 */
-		if (HandlerInfo.EventStatusUpdated == TRUE) {
-			break;
-		}
+	/*
+	 * Set the Address as a RESPOND type.
+	 */
+	Status = XIic_SetAddress(&IicInstance, XII_ADDR_TO_RESPOND_TYPE,
+				 SLAVE_ADDRESS);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
 	}
 
 	return Status;
 }
 
-int sendToSlave(u8 simbol) {
-	u8 Index;
+/*****************************************************************************/
+/**
+* This function reads a buffer of bytes  when the IIC Master on the bus writes
+* data to the slave device.
+*
+* @param	BufferPtr contains the address of the data buffer to be filled.
+* @param	ByteCount contains the number of bytes in the buffer to be read.
+*
+* @return	XST_SUCCESS if successful else XST_FAILURE.
+*
+* @note		None
+*
+******************************************************************************/
+int SlaveReadData(u8 *BufferPtr, u16 ByteCount)
+{
+	int Status;
+	int i;
 
-//	for (Index = 0; Index < PAGE_SIZE; Index++) {
-//		WriteBuffer[Index] = 'G';
-//	}
+	/*
+	 * Set the defaults.
+	 */
+	ReceiveComplete = 1;
+
+	/*
+	 * Set the Global Interrupt Enable.
+	 */
+	XIic_IntrGlobalEnable(IicInstance.BaseAddress);
+
+	/*
+	 * Wait for AAS interrupt and completion of data reception.
+	 */
+	while ( ReceiveComplete) {
+		if (SlaveRead) {
+			XIic_SlaveRecv(&IicInstance, ReadBuffer, RECEIVE_COUNT);
+			SlaveRead = 0;
+		}
+	}
+
+	/*
+	 * Disable the Global Interrupt Enable.
+	 */
+	XIic_IntrGlobalDisable(IicInstance.BaseAddress);
+
+	/*
+	 * Stop the IIC device.
+	 */
+	Status = XIic_Stop(&IicInstance);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
+	}
+
+	for (i = 0; i < RECV_BUFF_SIZE; i++)
+		BufferPtr[i] = ReadBuffer[i];
+
+	return XST_SUCCESS;
+}
+
+/*****************************************************************************/
+/**
+* This function writes a buffer of bytes to the IIC bus when the IIC master
+* initiates a read operation.
+*
+* @param	ByteCount contains the number of bytes in the buffer to be
+*		written.
+*
+* @return	XST_SUCCESS if successful else XST_FAILURE.
+*
+* @note		None.
+*
+******************************************************************************/
+int SlaveWriteData(u8 simbol)
+{
+	int Status;
+
+	/*
+	 * Set the defaults.
+	 */
+	TransmitComplete = 1;
+
+	/*
+	 * Set the Global Interrupt Enable.
+	 */
+	XIic_IntrGlobalEnable(IicInstance.BaseAddress);
+
+
 	WriteBuffer[0] = simbol;
 
-	IicInstance.Stats.TxErrors = 0;
 
-	XIic_MasterSend(&IicInstance, WriteBuffer, PAGE_SIZE);
-	while(XIic_IsIicBusy(&IicInstance)){
+	/*
+	 * Wait for AAS interrupt and transmission to complete.
+	 */
+	while ((XIic_IsIicBusy(&IicInstance) == TRUE) || TransmitComplete) {
+		if (SlaveWrite) {
+			XIic_SlaveSend(&IicInstance, WriteBuffer, SEND_COUNT);
+			SlaveWrite = 0;
+		}
+	}
+
+	/*
+	 * Disable the Global Interrupt Enable bit.
+	 */
+	XIic_IntrGlobalDisable(IicInstance.BaseAddress);
+
+	/*
+	 * Stop the IIC device.
+	 */
+	Status = XIic_Stop(&IicInstance);
+	if (Status != XST_SUCCESS) {
+		return XST_FAILURE;
 	}
 
 	return XST_SUCCESS;
@@ -362,67 +371,70 @@ int sendToSlave(u8 simbol) {
 
 /****************************************************************************/
 /**
+* This Status handler is called asynchronously from an interrupt context and
+* indicates the events that have occurred.
+*
+* @param	InstancePtr is not used, but contains a pointer to the IIC
+* 		device driver instance which the handler is being called for.
+* @param	Event indicates whether it is a request for a write or read.
+*
+* @return	None.
+*
+* @note		None.
+*
+****************************************************************************/
+static void StatusHandler(XIic *InstancePtr, int Event)
+{
+	/*
+	 * Check whether the Event is to write or read the data from the slave.
+	 */
+	if (Event == XII_MASTER_WRITE_EVENT) {
+		/*
+		 * Its a Write request from Master.
+		 */
+		SlaveRead = 1;
+	} else {
+		/*
+		 * Its a Read request from the master.
+		 */
+		SlaveWrite = 1;
+	}
+}
+
+/****************************************************************************/
+/**
 * This Send handler is called asynchronously from an interrupt
 * context and indicates that data in the specified buffer has been sent.
 *
-* @param	CallBackRef is a pointer to the IIC device driver instance which
+* @param	InstancePtr is a pointer to the IIC driver instance for which
 *		the handler is being called for.
-* @param	ByteCount indicates the number of bytes remaining to be received of
-*		the requested byte count. A value of zero indicates all requested
-*		bytes were received.
 *
 * @return	None.
 *
-* @notes	None.
+* @note		None.
 *
 ****************************************************************************/
-static void SendHandler(void *CallbackRef, int ByteCount){
-	HandlerInfo.RemainingSendBytes = ByteCount;
-	HandlerInfo.SendBytesUpdated = TRUE;
+static void SendHandler(XIic *InstancePtr)
+{
+	TransmitComplete = 0;
 }
 
-/*****************************************************************************/
+/****************************************************************************/
 /**
-* This receive handler is called asynchronously from an interrupt context and
-* and indicates that data in the specified buffer was received. The byte count
-* should equal the byte count of the buffer if all the buffer was filled.
+* This Receive handler is called asynchronously from an interrupt
+* context and indicates that data in the specified buffer has been Received.
 *
-* @param	CallBackRef is a pointer to the IIC device driver instance which
-*		the handler is being called for.
-* @param	ByteCount indicates the number of bytes remaining to be received of
-*		the requested byte count. A value of zero indicates all requested
-*		bytes were received.
+* @param	InstancePtr is a pointer to the IIC driver instance for which
+* 		the handler is being called for.
 *
 * @return	None.
 *
-* @notes	None.
+* @note		None.
 *
 ****************************************************************************/
-static void RecvHandler(void *CallbackRef, int ByteCount)
+static void ReceiveHandler(XIic *InstancePtr)
 {
-	HandlerInfo.RemainingRecvBytes = ByteCount;
-	HandlerInfo.RecvBytesUpdated = TRUE;
-}
-
-/*****************************************************************************/
-/**
-* This status handler is called asynchronously from an interrupt context and
-* indicates that the conditions of the IIC bus changed. This  handler should
-* not be called for the application unless an error occurs.
-*
-* @param	CallBackRef is a pointer to the IIC device driver instance which the
-*		handler is being called for.
-* @param	Status contains the status of the IIC bus which changed.
-*
-* @return	None.
-*
-* @notes	None.
-*
-****************************************************************************/
-static void StatusHandler(void *CallbackRef, int Status)
-{
-	HandlerInfo.EventStatus |= Status;
-	HandlerInfo.EventStatusUpdated = TRUE;
+	ReceiveComplete = 0;
 }
 
 /****************************************************************************/
@@ -503,3 +515,4 @@ static int SetupInterruptSystem(XIic * IicInstPtr)
 
 	return XST_SUCCESS;
 }
+
