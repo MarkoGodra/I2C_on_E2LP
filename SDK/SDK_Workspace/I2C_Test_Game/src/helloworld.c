@@ -121,6 +121,10 @@ int main()
 
 	unsigned char string_s[] = "ODABERITE SIMBOL\n";
 	unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
+	unsigned char string_igrac[] = "IGRAC 1";
+	unsigned char string_kamen[] = "KAMEN";
+	unsigned char string_makaze[] = "MAKAZE";
+	unsigned char string_papir[] = "PAPIR";
 	u8 winner;
 
 	init_platform();
@@ -139,7 +143,6 @@ int main()
 	}
 
 	while(1){
-
 		state = IDLE;
 		state = IDLE;
 
@@ -153,12 +156,12 @@ int main()
 
 		clear_text_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
 		clear_graphics_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
-		//draw_square(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
-		set_cursor(350);
+
+		set_cursor(373);
 		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_s, 16);
 
-		set_cursor(2910);
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 1", 7);
+		set_cursor(4228);
+		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_igrac, 7);
 
 		while(1){
 			button = Xil_In32LE(XPAR_MY_PERIPHERAL_0_BASEADDR);
@@ -168,7 +171,7 @@ int main()
 			}else if ((button & DOWN) == 0) {
 				state = DOWN_PRESSED;
 			}else if ((button & RIGHT) == 0) {
-			state = RIGHT_PRESSED;
+				state = RIGHT_PRESSED;
 			}else if ((button & LEFT) == 0) {
 				state = LEFT_PRESSED;
 			}else if ((button & CENTER) == 0) {
@@ -182,21 +185,33 @@ int main()
 			}
 		}
 
-		set_cursor(350);
+		clear_text_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
+		set_cursor(368);
 		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_odabrali, 19);
-		set_cursor(990);
+		set_cursor(4228);
+		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_igrac, 7);
+
 		switch(state){
 			case UP_PRESSED :
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "MAKAZE", 6);
+				set_cursor(1030);
+				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_makaze, 6);
 				simbol = 'M';
 				break;
 			case LEFT_PRESSED :
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "PAPIR", 5);
+				set_cursor(1033);
+				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_papir, 5);
 				simbol = 'P';
 				break;
 			case RIGHT_PRESSED :
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "KAMEN", 5);
+				set_cursor(1033);
+				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_kamen, 5);
 				simbol = 'K';
+				break;
+			case DOWN_PRESSED :
+				break;
+			case CENTER_PRESSED :
+				break;
+			case IDLE:
 				break;
 		}
 
@@ -211,39 +226,39 @@ int main()
 		slaveSym = slavePtr[0];
 
 		if(simbol == slaveSym){
-			set_cursor(1630);
-			const u8 rezultat[] = "NERESENO\n";
+			set_cursor(1668);
+			u8 rezultat[] = "NERESENO\n";
 			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 8);
 			winner = 0;
 		}else if(simbol == 'K' && slaveSym == 'P'){
-			set_cursor(1630);
-			const u8 rezultat[] = "IGRAC 2 POBEDJUJE\n";
+			set_cursor(1652);
+			u8 rezultat[] = "IGRAC 2 POBEDJUJE\n";
 			winner = 2;
 			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
 		}else if(simbol == 'K' && slaveSym == 'M'){
-			set_cursor(1630);
+			set_cursor(1652);
 			winner = 1;
-			const u8 rezultat[] = "IGRAC 1 POBEDJUJE\n";
+			u8 rezultat[] = "IGRAC 1 POBEDJUJE\n";
 			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
 		}else if(simbol == 'P' && slaveSym == 'M'){
-			set_cursor(1630);
+			set_cursor(1652);
 			winner = 2;
-			const u8 rezultat[] = "IGRAC 2 POBEDJUJE\n";
+			u8 rezultat[] = "IGRAC 2 POBEDJUJE\n";
 			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
 		}else if(simbol == 'P' && slaveSym == 'K'){
-			set_cursor(1630);
+			set_cursor(1652);
 			winner = 1;
-			const u8 rezultat[] = "IGRAC 1 POBEDJUJE\n";
+			u8 rezultat[] = "IGRAC 1 POBEDJUJE\n";
 			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
 		}else if(simbol == 'M' && slaveSym == 'K'){
-			set_cursor(1630);
+			set_cursor(1652);
 			winner = 2;
-			const u8 rezultat[] = "IGRAC 2 POBEDJUJE\n";
+			u8 rezultat[] = "IGRAC 2 POBEDJUJE\n";
 			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
 		}else if(simbol == 'M' && slaveSym == 'P'){
-			set_cursor(1630);
+			set_cursor(1652);
 			winner = 1;
-			const u8 rezultat[] = "IGRAC 1 POBEDJUJE\n";
+			u8 rezultat[] = "IGRAC 1 POBEDJUJE\n";
 			print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, rezultat, 17);
 		}
 
@@ -255,15 +270,12 @@ int main()
 
 		for(i = -10000000; i < 10000000; i++){
 
-				}
+		}
 
 		i = 0;
-
 	}
 
-
  	return 0;
-
 }
 
 int initIICMaster(u16 IicDeviceId, u8 slaveAddress) {
@@ -364,11 +376,6 @@ int recvFromSlave(u8* slaveDataPtr) {
 }
 
 int sendToSlave(u8 simbol) {
-	u8 Index;
-
-//	for (Index = 0; Index < PAGE_SIZE; Index++) {
-//		WriteBuffer[Index] = 'G';
-//	}
 	WriteBuffer[0] = simbol;
 
 	IicInstance.Stats.TxErrors = 0;
