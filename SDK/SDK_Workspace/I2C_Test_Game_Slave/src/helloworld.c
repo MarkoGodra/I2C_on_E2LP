@@ -110,11 +110,20 @@ int main()
 		UP_PRESSED
 	} state_t;
 
+	unsigned char string_s[] = "ODABERITE SIMBOL\n";
+	unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
+	unsigned char string_igrac[] = "IGRAC 1";
+	unsigned char string_kamen[] = "KAMEN";
+	unsigned char string_makaze[] = "MAKAZE";
+	unsigned char string_papir[] = "PAPIR";
+	unsigned char string_cekam[] = "CEKAM";
+	unsigned char string_nereseno[] = "NERESENO";
+	unsigned char string_pobeda_1[] = "IGRAC 1 POBEDJUJE";
+	unsigned char string_pobeda_2[] = "IGRAC 2 POBEDJUJE";
+
 	init_platform();
 	initIICSlave(XPAR_AXI_IIC_0_DEVICE_ID, SLAVE_ADDRESS);
 	u8 simbol;
-	unsigned char string_s[] = "ODABERITE SIMBOL\n";
-	unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
 	state_t state = IDLE;
 	state_t p_state = IDLE;
 	int button;
@@ -135,13 +144,12 @@ int main()
 
 		clear_text_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
 		clear_graphics_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
-		//draw_square(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
 
 		set_cursor(395);
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "CEKAM", 5);
+		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_cekam, 5);
 
 		set_cursor(4228);
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 2", 7);
+		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_igrac, 7);
 
 		SlaveReadData(buf, sizeof(buf));
 
@@ -175,7 +183,7 @@ int main()
 		clear_graphics_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
 
 		set_cursor(4228);
-		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 2", 7);
+		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_igrac, 7);
 		set_cursor(368);
 		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_odabrali, 19);
 
@@ -183,26 +191,28 @@ int main()
 		switch(state){
 			case UP_PRESSED :
 				set_cursor(1030);
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "MAKAZE", 6);
+				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_makaze, 6);
 				simbol = 'M';
 				break;
 			case LEFT_PRESSED :
 				set_cursor(1033);
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "PAPIR", 5);
+				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_papir, 5);
 				simbol = 'P';
 				break;
 			case RIGHT_PRESSED :
 				set_cursor(1033);
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "KAMEN", 5);
+				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_kamen, 5);
 				simbol = 'K';
+				break;
+			case DOWN_PRESSED :
+				break;
+			case CENTER_PRESSED :
+				break;
+			case IDLE :
 				break;
 		}
 
-
-
 		SlaveWriteData(simbol);
-
-
 		SlaveReadData(win, sizeof(win));
 
 		int winner = win[0];
@@ -210,17 +220,16 @@ int main()
 		switch(winner){
 			case 0 :
 				set_cursor(1668);
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "NERESENO", 8);
+				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_nereseno, 8);
 				break;
 			case 1 :
 				set_cursor(1652);
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 1 POBEDJUJE", 17);
+				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_pobeda_1, 17);
 				break;
 			case 2 :
 				set_cursor(1652);
-				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 2 POBEDJUJE", 17);
+				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_pobeda_2, 17);
 				break;
-
 		}
 
 		for (i = -10000000; i < 10000000; i++){
@@ -228,7 +237,6 @@ int main()
 		}
 
 		i = 0;
-
 	}
 
 	return 0;
