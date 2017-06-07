@@ -137,15 +137,15 @@ int main()
 		clear_graphics_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
 		//draw_square(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
 
-		set_cursor(350);
+		set_cursor(395);
 		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "CEKAM", 5);
 
-		set_cursor(2910);
+		set_cursor(4228);
 		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 2", 7);
 
 		SlaveReadData(buf, sizeof(buf));
 
-		set_cursor(350);
+		set_cursor(373);
 		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_s, 16);
 
 
@@ -157,7 +157,7 @@ int main()
 			}else if ((button & DOWN) == 0) {
 				state = DOWN_PRESSED;
 			}else if ((button & RIGHT) == 0) {
-			state = RIGHT_PRESSED;
+				state = RIGHT_PRESSED;
 			}else if ((button & LEFT) == 0) {
 				state = LEFT_PRESSED;
 			}else if ((button & CENTER) == 0) {
@@ -171,19 +171,28 @@ int main()
 			}
 		}
 
-		set_cursor(350);
+		clear_text_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
+		clear_graphics_screen(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR);
+
+		set_cursor(4228);
+		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 2", 7);
+		set_cursor(368);
 		print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, string_odabrali, 19);
-		set_cursor(990);
+
+
 		switch(state){
 			case UP_PRESSED :
+				set_cursor(1030);
 				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "MAKAZE", 6);
 				simbol = 'M';
 				break;
 			case LEFT_PRESSED :
+				set_cursor(1033);
 				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "PAPIR", 5);
 				simbol = 'P';
 				break;
 			case RIGHT_PRESSED :
+				set_cursor(1033);
 				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "KAMEN", 5);
 				simbol = 'K';
 				break;
@@ -200,15 +209,15 @@ int main()
 
 		switch(winner){
 			case 0 :
-				set_cursor(1630);
+				set_cursor(1668);
 				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "NERESENO", 8);
 				break;
 			case 1 :
-				set_cursor(1630);
+				set_cursor(1652);
 				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 1 POBEDJUJE", 17);
 				break;
 			case 2 :
-				set_cursor(1630);
+				set_cursor(1652);
 				print_string(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR, "IGRAC 2 POBEDJUJE", 17);
 				break;
 
