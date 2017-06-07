@@ -112,7 +112,7 @@ int main()
 
 	unsigned char string_s[] = "ODABERITE SIMBOL\n";
 	unsigned char string_odabrali[] = "ODABRALI STE SIMBOL";
-	unsigned char string_igrac[] = "IGRAC 1";
+	unsigned char string_igrac[] = "IGRAC 2";
 	unsigned char string_kamen[] = "KAMEN";
 	unsigned char string_makaze[] = "MAKAZE";
 	unsigned char string_papir[] = "PAPIR";
@@ -128,6 +128,7 @@ int main()
 	state_t p_state = IDLE;
 	int button;
 	int i;
+	int j;
 
 	while(1){
 
@@ -232,10 +233,27 @@ int main()
 				break;
 		}
 
-		for (i = -10000000; i < 10000000; i++){
-
+		if(winner == 2) {
+			for(i = 0; i < 4; i++) {
+				if(i % 2 == 0) {
+					VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x10, 0x0000FF);// foreground 4
+					VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x14, 0xFFFFFF);// background color 5
+					for(j = -2500000; j < 2500000; j++);
+				}
+				else {
+					VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x10, 0xFFFFFF);// foreground 4
+					VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x14, 0x0000FF);// background color 5
+					for(j = -2500000; j < 2500000; j++);
+				}
+			}
+		}
+		else {
+			for (i = -10000000; i < 10000000; i++){
+			}
 		}
 
+		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x10, 0xFFFFFF);// foreground 4
+		VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x14, 0x0000FF);// background color 5
 		i = 0;
 	}
 

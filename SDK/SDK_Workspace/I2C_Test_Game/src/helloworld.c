@@ -135,6 +135,7 @@ int main()
 	int button;
 	u8 slaveSym;
 	int i;
+	int j;
 	u8 simbol;
 
 	Status =  initIICMaster(IIC_DEVICE_ID, SLAVE_ADDRESS);
@@ -268,9 +269,25 @@ int main()
 
 		sendToSlave(winner);
 
-		for(i = -10000000; i < 10000000; i++){
-
+		if(winner == 1) {
+			for(i = 0; i < 4; i++) {
+				if(i % 2 == 0) {
+					VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x10, 0x0000FF);// foreground 4
+					VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x14, 0xFFFFFF);// background color 5
+					for(j = -2500000; j < 2500000; j++);
+				}
+				else {
+					VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x10, 0xFFFFFF);// foreground 4
+					VGA_PERIPH_MEM_mWriteMemory(XPAR_VGA_PERIPH_MEM_0_S_AXI_MEM0_BASEADDR + 0x14, 0x0000FF);// background color 5
+					for(j = -2500000; j < 2500000; j++);
+				}
+			}
 		}
+		else {
+			for (i = -10000000; i < 10000000; i++){
+			}
+		}
+
 
 		i = 0;
 	}
